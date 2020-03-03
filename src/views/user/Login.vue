@@ -11,7 +11,7 @@
               size="large"
               v-decorator="['username',validatorRules.username,{ validator: this.handleUsernameOrEmail }]"
               type="text"
-              placeholder="请输入帐户名 / jeecg">
+              placeholder="请输入帐户名">
               <a-icon slot="prefix" type="user" :style="{ color: 'rgba(0,0,0,.25)' }"/>
             </a-input>
           </a-form-item>
@@ -22,7 +22,7 @@
               size="large"
               type="password"
               autocomplete="false"
-              placeholder="密码 / 123456">
+              placeholder="密码">
               <a-icon slot="prefix" type="lock" :style="{ color: 'rgba(0,0,0,.25)' }"/>
             </a-input>
           </a-form-item>
@@ -392,27 +392,29 @@
         }
       },
       departConfirm(res){
-        if(res.success){
-          let multi_depart = res.result.multi_depart
-          //0:无部门 1:一个部门 2:多个部门
-          if(multi_depart==0){
-            this.loginSuccess()
-            this.$notification.warn({
-              message: '提示',
-              description: `您尚未归属部门,请确认账号信息`,
-              duration:3
-            });
-          }else if(multi_depart==2){
-            this.departVisible=true
-            this.currentUsername=this.form.getFieldValue("username")
-            this.departList = res.result.departs
-          }else {
-            this.loginSuccess()
-          }
-        }else{
-          this.requestFailed(res)
-          this.Logout();
-        }
+        console.log("loginSuccess")
+        this.loginSuccess();
+        // if(res.success){
+        //   let multi_depart = res.result.multi_depart
+        //   //0:无部门 1:一个部门 2:多个部门
+        //   if(multi_depart==0){
+        //     this.loginSuccess()
+        //     this.$notification.warn({
+        //       message: '提示',
+        //       description: `您尚未归属部门,请确认账号信息`,
+        //       duration:3
+        //     });
+        //   }else if(multi_depart==2){
+        //     this.departVisible=true
+        //     this.currentUsername=this.form.getFieldValue("username")
+        //     this.departList = res.result.departs
+        //   }else {
+        //     this.loginSuccess()
+        //   }
+        // }else{
+        //   this.requestFailed(res)
+        //   this.Logout();
+        // }
       },
       departOk(){
         if(!this.departSelected){

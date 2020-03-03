@@ -147,7 +147,7 @@
         return new Promise((resolve)=>{
           if(this.remote==true){
             getAction("/sys/getCheckCode").then(res=>{
-              console.log("aaaaa",res)
+              console.log("验证码填写快捷方式",res)
               if(res.success){
                 this.checkKey = res.result.key
                 this.code = res.result.code

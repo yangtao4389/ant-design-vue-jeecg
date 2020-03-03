@@ -68,6 +68,7 @@ const user = {
           if(response.code =='200'){
             const result = response.result
             const userInfo = result.userInfo
+            console.log(result)
             Vue.ls.set(ACCESS_TOKEN, result.token, 7 * 24 * 60 * 60 * 1000)
             Vue.ls.set(USER_NAME, userInfo.username, 7 * 24 * 60 * 60 * 1000)
             Vue.ls.set(USER_INFO, userInfo, 7 * 24 * 60 * 60 * 1000)
@@ -134,7 +135,9 @@ const user = {
     // 登出
     Logout({ commit, state }) {
       return new Promise((resolve) => {
-        let logoutToken = state.token;
+        // let logoutToken = state.token;
+        let logoutToken = Vue.ls.get(ACCESS_TOKEN);
+        console.log("logoutToken",logoutToken)
         commit('SET_TOKEN', '')
         commit('SET_PERMISSIONLIST', [])
         Vue.ls.remove(ACCESS_TOKEN)
