@@ -278,8 +278,9 @@
         })
       },
       getQueryParams() {
-        //获取查询条件
+        //获取查询条件queryTables
         var param = Object.assign({}, this.queryParam, this.isorter ,this.filters);
+        console.log("获取查询条件queryTables:",param)
         param.field = this.getQueryField();
         param.pageNo = this.ipagination.current;
         param.pageSize = this.ipagination.pageSize;
