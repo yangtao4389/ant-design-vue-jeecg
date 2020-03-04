@@ -14,7 +14,9 @@ src\config\router.config.js  配置了path，并在这里包含了登录、注�
 系统如何默认跳转到登录？  path: '/user',
 src\router\README.md 这里详细描述了路由的具体走向
 
-
+### 请求的信息
+JeecgListMixin
+使用了这里的方法，所以有很多自带属性在里面。
 
 ## 后台处理
 角色删除，使用虚拟删除。

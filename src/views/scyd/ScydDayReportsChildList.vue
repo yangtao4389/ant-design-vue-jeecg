@@ -184,7 +184,12 @@
         },
         dictOptions:{
         },
-        tableScroll:{x :6*147+50}
+        tableScroll:{x :6*147+50},
+        /* 排序参数 */
+        isorter:{
+          // column: 'createTime',
+          order: 'desc',
+        }
       }
     },
     computed: {
