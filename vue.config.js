@@ -59,7 +59,6 @@ module.exports = {
         }
       },*/
       '/jeecg-boot': {
-        // target: 'http://211.149.152.172:18080', //请求本地 需要jeecg-boot后台项目
         target: 'http://127.0.0.1:18080', //请求本地 需要jeecg-boot后台项目
         ws: false,
         changeOrigin: true
