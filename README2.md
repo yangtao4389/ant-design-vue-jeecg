@@ -26,4 +26,5 @@ views\scyd\ScydDayReportsChildList.vue  参考 views\list\PermissionList.vue
 后台也需要参考这样获取数据。
 
 现在没解决的是  查询，重置，这些操作 是无效的
-
+src\views\system\LogList.vue
+这里有日期的格式显示

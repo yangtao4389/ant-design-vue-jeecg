@@ -1,17 +1,17 @@
 <template>
-  <a-modal
+  <a-drawer
     :title="title"
     :width="width"
-    :visible="visible"
-    :confirmLoading="confirmLoading"
-    @ok="handleOk"
-    @cancel="handleCancel"
-    cancelText="关闭">
+    placement="right"
+    :closable="false"
+    @close="close"
+    :visible="visible">
+  
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
 
-        <a-form-item label="date" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-date placeholder="请选择date" v-decorator="[ 'date', validatorRules.date]" :trigger-change="true" style="width: 100%"/>
+        <a-form-item label="日期" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-date placeholder="请选择日期" v-decorator="[ 'date', validatorRules.date]" :trigger-change="true" style="width: 100%"/>
         </a-form-item>
         <a-form-item label="uv" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input-number v-decorator="[ 'uv', validatorRules.uv]" placeholder="请输入uv" style="width: 100%"/>
@@ -19,19 +19,27 @@
         <a-form-item label="pv" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input-number v-decorator="[ 'pv', validatorRules.pv]" placeholder="请输入pv" style="width: 100%"/>
         </a-form-item>
-        <a-form-item label="orderNum" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input-number v-decorator="[ 'orderNum', validatorRules.orderNum]" placeholder="请输入orderNum" style="width: 100%"/>
+        <a-form-item label="订购量" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number v-decorator="[ 'ordernum', validatorRules.ordernum]" placeholder="请输入订购量" style="width: 100%"/>
         </a-form-item>
-        <a-form-item label="fakeOrderNum" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input-number v-decorator="[ 'fakeOrderNum', validatorRules.fakeOrderNum]" placeholder="请输入fakeOrderNum" style="width: 100%"/>
+        <a-form-item label="转化率" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number v-decorator="[ 'percent', validatorRules.percent]" placeholder="请输入转化率" style="width: 100%"/>
         </a-form-item>
-        <a-form-item label="percent" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input-number v-decorator="[ 'percent', validatorRules.percent]" placeholder="请输入percent" style="width: 100%"/>
+        <a-form-item label="地区ID" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'carrierid', validatorRules.carrierid]" placeholder="请输入地区ID"></a-input>
         </a-form-item>
-
+        <a-form-item label="地区名" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'carriername', validatorRules.carriername]" placeholder="请输入地区名"></a-input>
+        </a-form-item>
+        <a-form-item label="自订购数据" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input-number v-decorator="[ 'fakeordernum', validatorRules.fakeordernum]" placeholder="请输入自订购数据" style="width: 100%"/>
+        </a-form-item>
+        
       </a-form>
     </a-spin>
-  </a-modal>
+    <a-button type="primary" @click="handleOk">确定</a-button>
+    <a-button type="primary" @click="handleCancel">取消</a-button>
+  </a-drawer>
 </template>
 
 <script>
@@ -40,9 +48,9 @@
   import pick from 'lodash.pick'
   import { validateDuplicateValue } from '@/utils/util'
   import JDate from '@/components/jeecg/JDate'  
-
+  
   export default {
-    name: "ScydDayReportsChildModal",
+    name: "ScydDayReportsVideoModal",
     components: { 
       JDate,
     },
@@ -64,22 +72,26 @@
         confirmLoading: false,
         validatorRules: {
           date: {rules: [
-            {required: true, message: '请输入date!'},
+            {required: true, message: '请输入日期!'},
           ]},
           uv: {rules: [
           ]},
           pv: {rules: [
           ]},
-          orderNum: {rules: [
-          ]},
-          fakeOrderNum: {rules: [
+          ordernum: {rules: [
           ]},
           percent: {rules: [
           ]},
+          carrierid: {rules: [
+          ]},
+          carriername: {rules: [
+          ]},
+          fakeordernum: {rules: [
+          ]},
         },
         url: {
-          add: "/scyd/scydDayReportsChild/add",
-          edit: "/scyd/scydDayReportsChild/edit",
+          add: "/scyd/scydDayReportsVideo/add",
+          edit: "/scyd/scydDayReportsVideo/edit",
         }
       }
     },
@@ -94,7 +106,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'date','uv','pv','orderNum','fakeOrderNum','percent'))
+          this.form.setFieldsValue(pick(this.model,'date','uv','pv','ordernum','percent','carrierid','carriername','fakeordernum'))
         })
       },
       close () {
@@ -137,10 +149,18 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'date','uv','pv','orderNum','fakeOrderNum','percent'))
-      },
-
+        this.form.setFieldsValue(pick(row,'date','uv','pv','ordernum','percent','carrierid','carriername','fakeordernum'))
+      }
       
     }
   }
 </script>
+
+<style lang="less" scoped>
+/** Button按钮间距 */
+  .ant-btn {
+    margin-left: 30px;
+    margin-bottom: 30px;
+    float: right;
+  }
+</style>

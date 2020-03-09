@@ -2,7 +2,7 @@
   <a-card :bordered="false">
     <!-- 查询区域 -->
     <div class="table-page-search-wrapper">
-      <a-form layout="inline" >
+      <a-form layout="inline" @keyup.enter.native="searchQuery">
         <a-row :gutter="48">
           <a-col :md="8" :sm="24">
             <a-form-item label="日期">
@@ -13,7 +13,7 @@
           </a-col>
           <a-col :md="8" :sm="24" >
             <a-form-item label="产品列表">
-              <a-select placeholder="产品列表" default-value="0">
+              <a-select placeholder="产品列表" v-model="queryParam.product_type" default-value="0">
                 <a-select-option value="0">少儿</a-select-option>
                 <a-select-option value="1">电竞</a-select-option>
                 <a-select-option value="2">游戏</a-select-option>
@@ -22,8 +22,8 @@
           </a-col>
           <a-col :md="8" :sm="24">
             <span class="table-page-search-submitButtons">
-              <a-button type="primary">查询</a-button>
-              <a-button style="margin-left: 8px">重置</a-button>
+              <a-button type="primary" @click="searchQuery">查询</a-button>
+              <a-button style="margin-left: 8px"  @click="searchReset" >重置</a-button>
             </span>
           </a-col>
 
@@ -39,85 +39,9 @@
     </div>
 
     <!-- table区域-begin -->
-    <s-table :columns="columns" :data="loadData" >
+    <s-table ref="table" rowKey="date" :columns="columns"  :dataSource="dataSource" :pagination="ipagination" :data="loadData" >
 
     </s-table>
-    <!--<div-->
-      <!--slot="expandedRowRender"-->
-      <!--slot-scope="record"-->
-      <!--style="margin: 0">-->
-      <!--<a-row-->
-        <!--:gutter="24"-->
-        <!--:style="{ marginBottom: '12px' }">-->
-        <!--<a-col :span="12" v-for="(role, index) in record.permissions" :key="index" :style="{ marginBottom: '12px' }">-->
-          <!--<a-col :lg="4" :md="24">-->
-            <!--<span>{{ role.permissionName }}：</span>-->
-          <!--</a-col>-->
-          <!--<a-col :lg="20" :md="24" v-if="role.actionEntitySet.length > 0">-->
-            <!--<a-tag color="cyan" v-for="(action, k) in role.actionEntitySet" :key="k">{{ action.describe }}</a-tag>-->
-          <!--</a-col>-->
-          <!--<a-col :span="20" v-else>-</a-col>-->
-        <!--</a-col>-->
-      <!--</a-row>-->
-    <!--</div>-->
-
-    <!--<div>-->
-      <!--<div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">-->
-        <!--<i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{ selectedRowKeys.length }}</a>项-->
-        <!--<a style="margin-left: 24px" @click="onClearSelected">清空</a>-->
-      <!--</div>-->
-
-      <!--<a-table-->
-        <!--ref="table"-->
-        <!--size="middle"-->
-        <!--bordered-->
-        <!--rowKey="id"-->
-        <!--:columns="columns"-->
-        <!--:dataSource="dataSource"-->
-        <!--:pagination="ipagination"-->
-        <!--:loading="loading"-->
-        <!--:rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"-->
-        <!--:scroll="tableScroll"-->
-        <!--@change="handleTableChange">-->
-
-        <!--<template slot="htmlSlot" slot-scope="text">-->
-          <!--<div v-html="text"></div>-->
-        <!--</template>-->
-        <!--<template slot="imgSlot" slot-scope="text">-->
-          <!--<span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>-->
-          <!--<img v-else :src="getImgView(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>-->
-        <!--</template>-->
-        <!--<template slot="fileSlot" slot-scope="text">-->
-          <!--<span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>-->
-          <!--<a-button-->
-            <!--v-else-->
-            <!--:ghost="true"-->
-            <!--type="primary"-->
-            <!--icon="download"-->
-            <!--size="small"-->
-            <!--@click="uploadFile(text)">-->
-            <!--下载-->
-          <!--</a-button>-->
-        <!--</template>-->
-
-        <!--<span slot="action" slot-scope="text, record">-->
-          <!--<a @click="handleEdit(record)">编辑</a>-->
-
-          <!--<a-divider type="vertical" />-->
-          <!--<a-dropdown>-->
-            <!--<a class="ant-dropdown-link">更多 <a-icon type="down" /></a>-->
-            <!--<a-menu slot="overlay">-->
-              <!--<a-menu-item>-->
-                <!--<a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">-->
-                  <!--<a>删除</a>-->
-                <!--</a-popconfirm>-->
-              <!--</a-menu-item>-->
-            <!--</a-menu>-->
-          <!--</a-dropdown>-->
-        <!--</span>-->
-
-      <!--</a-table>-->
-    <!--</div>-->
 
 
   </a-card>
@@ -125,13 +49,13 @@
 
 <script>
   import STable from '@/components/table/'
-  // import { JeecgListMixin } from '@/mixins/JeecgListMixin'
+  import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   // import ScydDayReportsChildModal from './modules/ScydDayReportsChildModal'
   import JDate from '@/components/jeecg/JDate.vue'
 
   export default {
     name: "ScydDayReportsChildList",
-    // mixins:[JeecgListMixin],
+    mixins:[JeecgListMixin],
     components: {
       STable,
       JDate,
@@ -186,10 +110,10 @@
         // 向后端拉取可以用的操作列表
         permissionList: null,
         // 加载数据方法 必须为 Promise 对象
-        loadData: parameter => {
-          return this.$http.get('/scyd/scydDayReportsChild/list', {
-            params: Object.assign(parameter, this.queryParam)
-          }).then(res => {
+        // loadData: parameter => {
+        //   return this.$http.get('/scyd/scydDayReportsChild/list', {
+        //     params: Object.assign(parameter, this.queryParam)
+        //   }).then(res => {
             /*
             data
             * pageSize: 10
@@ -198,23 +122,32 @@ totalPage: 1
 totalCount: 5
             *
             * */
-            let result = res.result
-            result.data = result.records
-            result.pageSize = result.pages
-            result.pageNo = result.current
-            result.totalPage = 1
-            result.totalCount =5
-            return result
+            // let result = res.result
+            // result.data = result.records
+            // result.pageSize = result.pages
+            // result.pageNo = result.current
+            // result.totalPage = 1
+            // result.totalCount =5
+            // return result
             // let result = res.result
             // result.data.map(permission => {
             //   permission.actionList = JSON.parse(permission.actionData)
             //   return permission
             // })
             // return result
-          })
-        },
+        //   })
+        // },
         selectedRowKeys: [],
-        selectedRows: []
+        selectedRows: [],
+        url: {
+          list: "/scyd/scydDayReportsChild/list",
+        },
+        /* 排序参数 */
+        isorter:{
+          column: 'date',
+          order: 'date',
+        },
+
       }
     },
     computed: {
@@ -243,7 +176,47 @@ totalCount: 5
           this.permissionList = res
         })
       },
-       
+      // 重置
+      searchReset(){
+        var that = this;
+        // var logType = that.queryParam.logType;
+        that.queryParam = {}; //清空查询区域参数
+        // that.queryParam.logType = logType;
+        that.loadData();
+      },
+
+      // getQueryParams(){
+      //   console.log(this.queryParam.createTimeRange)
+      //   var param = Object.assign({}, this.queryParam,this.isorter);
+      //   param.field = this.getQueryField();
+      //   param.pageNo = this.ipagination.current;
+      //   param.pageSize = this.ipagination.pageSize;
+      //   delete param.createTimeRange; // 时间参数不传递后台
+      //   // return filterObj(param);
+      //   return param;
+      // },
+      loadData(arg) {
+        if(!this.url.list){
+          this.$message.error("请设置url.list属性!")
+          return
+        }
+        //加载数据 若传入参数1则加载第一页的内容
+        if (arg === 1) {
+          this.ipagination.current = 1;
+        }
+        var params = this.getQueryParams();//查询条件
+        this.loading = true;
+        getAction(this.url.list, params).then((res) => {
+          if (res.success) {
+            this.dataSource = res.result.records;
+            this.ipagination.total = res.result.total;
+          }
+          if(res.code===510){
+            this.$message.warning(res.message)
+          }
+          this.loading = false;
+        })
+      },
     }
   }
 </script>
