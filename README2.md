@@ -28,3 +28,13 @@ views\scyd\ScydDayReportsChildList.vue  参考 views\list\PermissionList.vue
 现在没解决的是  查询，重置，这些操作 是无效的
 src\views\system\LogList.vue
 这里有日期的格式显示
+
+
+Flex 布局是基于 24 栅格来定义每一个『盒子』的宽度，但不拘泥于栅格。
+
+src\views\scyd\ScydDayReportsVideoList.vue
+再添加的功能有：
+分屏展示，展示动态图
+展示列表
+导出功能使用前端自带的，而不是后端生成
+

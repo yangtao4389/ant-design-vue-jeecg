@@ -3,7 +3,30 @@
     <!-- 查询区域 -->
     <div class="table-page-search-wrapper">
       <a-form layout="inline" @keyup.enter.native="searchQuery">
-        <a-row :gutter="24">
+        <a-row :gutter="16">
+          <a-col :xs="24" :sm="24" :md="10" :lg="10" :xl="8">
+            <a-form-item label="日期"
+                         >
+              <j-date placeholder="开始日期" class="query-group-cust" v-model="queryParam.date_begin"></j-date>
+              <span class="query-group-split-cust"></span>
+              <j-date placeholder="结束日期" class="query-group-cust" v-model="queryParam.date_end"></j-date>
+            </a-form-item>
+          </a-col>
+          <a-col :xs="24" :sm="24" :md="10" :lg="10" :xl="8">
+            <a-form-item label="产品列表">
+              <a-select placeholder="产品列表" v-model="queryParam.product_type" default-value="0">
+                <a-select-option value="0">少儿</a-select-option>
+                <a-select-option value="1">电竞</a-select-option>
+                <a-select-option value="2">游戏</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col :xs="24" :sm="24" :md="4" :lg="4" :xl="4" >
+            <span class="table-page-search-submitButtons">
+              <a-button type="primary" @click="searchQuery">查询</a-button>
+              <a-button style="margin-left: 8px"  @click="searchReset" >重置</a-button>
+            </span>
+          </a-col>
 
         </a-row>
       </a-form>
@@ -12,98 +35,45 @@
     
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
       <a-button type="primary" icon="download" @click="handleExportXls('scyd_day_reports_video')">导出</a-button>
-      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
-        <a-button type="primary" icon="import">导入</a-button>
-      </a-upload>
-      <a-dropdown v-if="selectedRowKeys.length > 0">
-        <a-menu slot="overlay">
-          <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
-        </a-menu>
-        <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /></a-button>
-      </a-dropdown>
     </div>
 
-    <!-- table区域-begin -->
-    <div>
-<!--      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">-->
-<!--        <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{ selectedRowKeys.length }}</a>项-->
-<!--        <a style="margin-left: 24px" @click="onClearSelected">清空</a>-->
-<!--      </div>-->
-
-
-      <!--
-       :scroll="{ x: 800 }"
-      :rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-      -->
-      <a-table
-        :scroll="{ x: '130%' }"
+    <!-- table区域-begin
+     :scroll="{ x: '150%' }"
         ref="table"
         size="middle"
+        bordered  // 加边框
+
+    -->
+    <div>
+      <a-table
         bordered
         rowKey="date"
         :columns="columns"
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
-
-        
         @change="handleTableChange">
 
-        <template slot="htmlSlot" slot-scope="text">
-          <div v-html="text"></div>
-        </template>
-        <template slot="imgSlot" slot-scope="text">
-          <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
-          <img v-else :src="getImgView(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
-        </template>
-        <template slot="fileSlot" slot-scope="text">
-          <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
-          <a-button
-            v-else
-            :ghost="true"
-            type="primary"
-            icon="download"
-            size="small"
-            @click="uploadFile(text)">
-            下载
-          </a-button>
-        </template>
-
-        <span slot="action" slot-scope="text, record">
-          <a @click="handleEdit(record)">编辑</a>
-
-          <a-divider type="vertical" />
-          <a-dropdown>
-            <a class="ant-dropdown-link">更多 <a-icon type="down" /></a>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
-                  <a>删除</a>
-                </a-popconfirm>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
-        </span>
-
       </a-table>
+
     </div>
 
-    <scydDayReportsVideo-modal ref="modalForm" @ok="modalFormOk"></scydDayReportsVideo-modal>
+
   </a-card>
 </template>
 
 <script>
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
-  import ScydDayReportsVideoModal from './modules/ScydDayReportsVideoModal'
-
+  import JDate from '@/components/jeecg/JDate.vue'
+  import { filterObj,localDate } from '@/utils/util';
+  import { getAction} from '@/api/manage'
   export default {
     name: "ScydDayReportsVideoList",
     mixins:[JeecgListMixin],
     components: {
-      ScydDayReportsVideoModal
+      JDate,
     },
     data () {
       return {
@@ -114,16 +84,16 @@
           //   title: '#',
           //   dataIndex: '',
           //   key:'rowIndex',
-          //   width:60,
+          //   width:'10%',
           //   align:"center",
           //   customRender:function (t,r,index) {
           //     return parseInt(index)+1;
           //   }
           // },
           {
-            width:100,
-            fixed: 'left',
-            key:'rowIndex',
+            // width:'10%',
+            sorter: true, // 排序用？
+            // fixed: 'left',
             title:'日期',
             align:"center",
             dataIndex: 'date',
@@ -132,43 +102,47 @@
             }
           },
           {
-            width:100,
+            sorter: true, // 排序用
+            // width:'10%',
             title:'uv',
             align:"center",
             dataIndex: 'uv'
           },
           {
-            width:100,
+            sorter: true, // 排序用
+            // width:'10%',
             title:'pv',
             align:"center",
             dataIndex: 'pv'
           },
           {
-            width:100,
+            sorter: true, // 排序用
+            // width:'10%',
             title:'订购量',
             align:"center",
             dataIndex: 'ordernum'
           },
           {
-            width:100,
+            sorter: true, // 排序用
+            // width:'10%',
             title:'转化率',
             align:"center",
             dataIndex: 'percent'
           },
+          // {
+          //   width:100,
+          //   title:'地区ID',
+          //   align:"center",
+          //   dataIndex: 'carrierid'
+          // },
+          // {
+          //   width:100,
+          //   title:'地区名',
+          //   align:"center",
+          //   dataIndex: 'carriername'
+          // },
           {
-            width:100,
-            title:'地区ID',
-            align:"center",
-            dataIndex: 'carrierid'
-          },
-          {
-            width:100,
-            title:'地区名',
-            align:"center",
-            dataIndex: 'carriername'
-          },
-          {
-
+            sorter: true, // 排序用
             title:'自订购数据',
             align:"center",
             dataIndex: 'fakeordernum'
@@ -184,8 +158,12 @@
         },
         /* 排序参数 */
         isorter:{
-          column: 'date',
-          order: 'date',
+          column: '',
+          order: '',
+        },
+        queryParam: {
+          date_begin:localDate(),
+          date_end:localDate(),
         },
       }
     },
@@ -196,7 +174,56 @@
     },
     methods: {
       initDictConfig(){
-      }
+      },
+      loadData(arg) {
+        if(!this.url.list){
+          this.$message.error("请设置url.list属性!")
+          return
+        }
+        //加载数据 若传入参数1则加载第一页的内容
+        if (arg === 1) {
+          this.ipagination.current = 1;
+        }
+        var params = this.getQueryParams();//查询条件
+        // 判断是否有时间问题
+        if(!params.date_begin || !params.date_end){
+          this.$message.error("请选择查询日期")
+          return false;
+        }
+
+        this.loading = true;
+        getAction(this.url.list, params).then((res) => {
+          if (res.success) {
+            this.dataSource = res.result.records;
+            this.ipagination.total = res.result.total;
+          }
+          if(res.code===510){
+            this.$message.warning(res.message)
+          }
+          this.loading = false;
+        })
+      },
+      getQueryParams() {
+
+
+        //获取查询条件
+        let sqp = {}
+        if(this.superQueryParams){
+          sqp['superQueryParams']=encodeURI(this.superQueryParams)
+        }
+        var param = Object.assign(sqp, this.queryParam, this.isorter ,this.filters);
+        param.field = this.getQueryField();
+        param.pageNo = this.ipagination.current;
+        param.pageSize = this.ipagination.pageSize;
+        return filterObj(param);
+      },
+      searchReset() {
+        this.queryParam = {
+          date_begin:localDate(),
+          date_end:localDate(),
+        }
+        this.loadData(1);
+      },
        
     }
   }
