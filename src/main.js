@@ -7,8 +7,11 @@ import store from './store/'
 import { VueAxios } from "@/utils/request"
 
 import Antd from 'ant-design-vue'
-import Viser from 'viser-vue'
+// import Viser from 'viser-vue'
 import 'ant-design-vue/dist/antd.less';  // or 'ant-design-vue/dist/antd.less'
+
+// 20200310准备用VCharts 替换 Viser
+import VCharts from 'v-charts'
 
 import '@/permission' // permission control
 import '@/utils/filter' // base filter
@@ -45,7 +48,8 @@ Vue.config.productionTip = false
 Vue.use(Storage, config.storageOptions)
 Vue.use(Antd)
 Vue.use(VueAxios, router)
-Vue.use(Viser)
+// Vue.use(Viser)
+Vue.use(VCharts)
 Vue.use(hasPermission)
 Vue.use(JDictSelectTag)
 Vue.use(Print)

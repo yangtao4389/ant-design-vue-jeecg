@@ -38,3 +38,10 @@ src\views\scyd\ScydDayReportsVideoList.vue
 展示列表
 导出功能使用前端自带的，而不是后端生成
 
+yarn add v-charts echarts
+替换原先的表
+
+分页查询 还有问题
+后端分页不做处理，前端分页
+
+

@@ -46,16 +46,33 @@
 
     -->
     <div>
-      <a-table
-        bordered
-        rowKey="date"
-        :columns="columns"
-        :dataSource="dataSource"
-        :pagination="ipagination"
-        :loading="loading"
-        @change="handleTableChange">
 
-      </a-table>
+      <a-tabs defaultActiveKey="1">
+        <a-tab-pane key="1">
+      <span slot="tab">
+        <a-icon type="line-chart" />
+        图形展示
+      </span>
+          <ve-line :data="chartData" :settings="chartSettings"></ve-line>
+        </a-tab-pane>
+        <a-tab-pane key="2">
+      <span slot="tab">
+        <a-icon type="ordered-list" />
+        列表展示
+      </span>
+          <a-table
+            bordered
+            rowKey="date"
+            :columns="columns"
+            :dataSource="dataSource"
+            :pagination="ipagination"
+            :loading="loading"
+            @change="handleTableChange">
+
+          </a-table>
+        </a-tab-pane>
+      </a-tabs>
+
 
     </div>
 
@@ -69,13 +86,20 @@
   import JDate from '@/components/jeecg/JDate.vue'
   import { filterObj,localDate } from '@/utils/util';
   import { getAction} from '@/api/manage'
+  import ScydLineChartMultid from './modules/ScydLineChartMultid'
   export default {
     name: "ScydDayReportsVideoList",
     mixins:[JeecgListMixin],
     components: {
       JDate,
+      ScydLineChartMultid,
     },
     data () {
+      // this.chartSettings = {
+      //   axisSite: { right: ['下单率'] },
+      //   yAxisType: ['KMB', 'percent'],
+      //   yAxisName: ['数值', '比率']
+      // }
       return {
         description: 'scyd_day_reports_video管理页面',
         // 表头
@@ -165,6 +189,24 @@
           date_begin:localDate(),
           date_end:localDate(),
         },
+
+        /*试一下直接传入数据*/
+        chartSettings: {
+          labelMap: {
+            'uv': '访问用户',
+            'ordernum': '下单用户',
+            'percent':'转化率',
+          },
+          axisSite: { right: ['percent'] },
+          yAxisType: ['KMB', 'percent'],
+          yAxisName: ['人数', '比率']
+        },
+        chartData: {
+          columns: ['date', 'uv','ordernum', 'percent'],
+          rows: [
+
+          ]
+        },
       }
     },
     computed: {
@@ -196,6 +238,8 @@
           if (res.success) {
             this.dataSource = res.result.records;
             this.ipagination.total = res.result.total;
+            // 添加图表显示
+            this.chartData.rows = res.result.records;
           }
           if(res.code===510){
             this.$message.warning(res.message)
@@ -213,8 +257,9 @@
         }
         var param = Object.assign(sqp, this.queryParam, this.isorter ,this.filters);
         param.field = this.getQueryField();
-        param.pageNo = this.ipagination.current;
-        param.pageSize = this.ipagination.pageSize;
+        // param.pageNo = this.ipagination.current;
+        // param.pageSize = this.ipagination.pageSize;
+        // param.pageSize = 100;
         return filterObj(param);
       },
       searchReset() {
